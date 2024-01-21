@@ -9,7 +9,7 @@ use crate::{
     codec::CodecParameters,
     packet::{SideDataRef, SideDataType},
     time::{TimeBase, Timestamp},
-    Error,
+    Error, dict::Dict,
 };
 
 extern "C" {
@@ -18,6 +18,7 @@ extern "C" {
     fn ffw_stream_get_start_time(stream: *const c_void) -> i64;
     fn ffw_stream_get_duration(stream: *const c_void) -> i64;
     fn ffw_stream_get_nb_frames(stream: *const c_void) -> i64;
+    fn ffw_stream_get_metadata(stream: *const c_void) -> *const c_void;
     fn ffw_stream_get_codec_parameters(stream: *const c_void) -> *mut c_void;
     fn ffw_stream_get_id(stream: *const c_void) -> c_int;
     fn ffw_stream_set_metadata(
@@ -81,6 +82,17 @@ impl Stream {
         let pts = unsafe { ffw_stream_get_duration(self.ptr) as _ };
 
         Timestamp::new(pts, self.time_base)
+    }
+
+    /// Get metadata.
+    pub fn metadata(&self) -> Result<Dict<'_>, Error> {
+        let metadata = unsafe  { ffw_stream_get_metadata(self.ptr) };
+
+        if metadata.is_null() {
+            return Err(Error::new("metadata field on decoder is null"));
+        }
+
+        Ok(Dict::new(metadata))
     }
 
     /// Get the number of frames in the stream.

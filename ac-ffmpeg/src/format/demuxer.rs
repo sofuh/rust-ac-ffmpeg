@@ -15,7 +15,7 @@ use crate::{
     format::{io::IO, stream::Stream},
     packet::Packet,
     time::{TimeBase, Timestamp},
-    Error,
+    Error, dict::Dict,
 };
 
 extern "C" {
@@ -44,6 +44,7 @@ extern "C" {
     fn ffw_demuxer_find_stream_info(demuxer: *mut c_void, max_analyze_duration: i64) -> c_int;
     fn ffw_demuxer_get_nb_streams(demuxer: *const c_void) -> c_uint;
     fn ffw_demuxer_get_stream(demuxer: *mut c_void, index: c_uint) -> *mut c_void;
+    fn ffw_demuxer_get_metadata(demuxer: *const c_void) -> *const c_void;
     fn ffw_demuxer_get_input_format(demuxer: *const c_void) -> *const c_void;
     fn ffw_demuxer_read_frame(
         demuxer: *mut c_void,
@@ -205,6 +206,18 @@ impl Demuxer<()> {
 }
 
 impl<T> Demuxer<T> {
+    /// Get metadata.
+    pub fn metadata(&mut self) -> Result<Dict, Error> {
+        let metadata = unsafe { ffw_demuxer_get_metadata(self.ptr) };
+
+        if metadata.is_null() {
+            return Err(Error::new("metadata field on format context is null"));
+        }
+
+        let dict = Dict::new(metadata);
+        Ok(dict)
+    }
+
     /// Set an option.
     pub fn set_option<V>(&mut self, name: &str, value: V) -> Result<(), Error>
     where

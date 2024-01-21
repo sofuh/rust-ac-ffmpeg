@@ -42,6 +42,7 @@ fn main() {
         .file(src_dir.join("logger.c"))
         .file(src_dir.join("packet.c"))
         .file(src_dir.join("time.c"))
+        .file(src_dir.join("dict.c"))
         .file(src_format_dir.join("demuxer.c"))
         .file(src_format_dir.join("io.c"))
         .file(src_format_dir.join("muxer.c"))

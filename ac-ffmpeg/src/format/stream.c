@@ -4,6 +4,7 @@ void ffw_stream_get_time_base(const AVStream* stream, uint32_t* num, uint32_t* d
 int64_t ffw_stream_get_start_time(const AVStream* stream);
 int64_t ffw_stream_get_duration(const AVStream* stream);
 int64_t ffw_stream_get_nb_frames(const AVStream* stream);
+AVDictionary* ffw_stream_get_metadata(const AVStream* stream);
 AVCodecParameters* ffw_stream_get_codec_parameters(const AVStream* stream);
 int ffw_stream_set_metadata(AVStream* stream, const char* key, const char* value);
 
@@ -31,6 +32,10 @@ int64_t ffw_stream_get_nb_frames(const AVStream* stream) {
 
 int ffw_stream_get_id(const AVStream* stream) {
     return stream->id;
+}
+
+AVDictionary* ffw_stream_get_metadata(const AVStream* stream) {
+	return stream->metadata;
 }
 
 AVCodecParameters* ffw_stream_get_codec_parameters(const AVStream* stream) {
